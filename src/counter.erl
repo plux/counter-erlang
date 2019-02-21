@@ -134,3 +134,35 @@ do_elements([{K,V}|T]) when V > 0 ->
     lists:duplicate(V, K) ++ do_elements(T);
 do_elements([_|T]) ->
     do_elements(T).
+
+%%%_* Tests ============================================================
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+
+counter_test_() ->
+    A = #{a => 2},
+    B = #{b => 5, d => 4},
+    C = #{a => 2, b => 3, c => 1},
+    [ ?_assertEqual(C, count([a, b, c, b, b, a]))
+    , ?_assertEqual( #{a => 5, b => 5, c => 5}
+                   , count_with(fun(E) -> {E, 5} end, [a, b, c]))
+    , ?_assertEqual( C, from_list([{a, 1}, {a, 1}, {b, 1}, {b, 2}, {c, 1}]))
+    , ?_assertEqual(#{a => 3, b => 3, c => 1}, incr(C, a))
+    , ?_assertEqual(#{a => 12, b => 3, c => 1}, incr(C, a, 10))
+    , ?_assertEqual(#{a => 4, b => 6, c => 2}, add(C, C))
+    , ?_assertEqual(#{a => 2, b => -5, d => -4}, subtract(A, B))
+    , ?_assertEqual(#{a => 2, b => 3}, dups(C))
+    , ?_assertEqual([c], unique(C))
+    , ?_assertEqual({b, 3}, max(C))
+    , ?_assertEqual([{b, 3}, {a, 2}], most_common(C, 2))
+    , ?_assertEqual([{c, 1}, {a,2}], least_common(C, 2))
+    , ?_assertEqual({c, 1}, min(C))
+    , ?_assertEqual([a, a, b, b, b, c], elements(C))
+    , ?_assertEqual(C, count(elements(C)))
+    , ?_assertEqual(#{a => 2, b => 5, c => 1, d => 4}, union(B, C))
+    , ?_assertEqual(#{b => 3}, intersection(B, C))
+    , ?_assertEqual(#{a => 5}, only_positive(#{a => 5, b => -5, c => 0}))
+    , ?_assertEqual(6, sum(C))
+    ].
+
+-endif.
